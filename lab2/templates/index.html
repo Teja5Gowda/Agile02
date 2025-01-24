@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Frequency Trading Platform</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        header { text-align: center; margin-bottom: 20px; }
+        section { margin-bottom: 40px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        .profit { color: green; }
+        .loss { color: red; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>High-Frequency Trading Platform</h1>
+    </header>
+
+    <main>
+        <!-- Market Data Section -->
+        <section>
+            <h2>Market Data</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stock</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock, price in market_data.items() %}
+                    <tr>
+                        <td>{{ stock }}</td>
+                        <td>${{ "%.2f"|format(price) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section>
+            <h2>Your Portfolio</h2>
+            <p>Cash Balance: ${{ "%.2f"|format(portfolio.cash) }}</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stock</th>
+                        <th>Quantity</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock, quantity in portfolio.assets.items() %}
+                    <tr>
+                        <td>{{ stock }}</td>
+                        <td>{{ quantity }}</td>
+                        <td>${{ "%.2f"|format(quantity * market_data[stock]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Analytics Section -->
+        <section>
+            <h2>Analytics</h2>
+            <p>Total Portfolio Value: ${{ "%.2f"|format(total_value) }}</p>
+            <p>Profit/Loss: 
+                {% if profit_loss >= 0 %}
+                <span class="profit">+${{ "%.2f"|format(profit_loss) }}</span>
+                {% else %}
+                <span class="loss">-${{ "%.2f"|format(abs(profit_loss)) }}</span>
+                {% endif %}
+            </p>
+        </section>
+
+        <!-- Trade Section -->
+        <section>
+            <h2>Make a Trade</h2>
+            <form action="/trade" method="POST">
+                <label for="action">Action:</label>
+                <select id="action" name="action">
+                    <option value="buy">Buy</option>
+                    <option value="sell">Sell</option>
+                </select>
+                <label for="stock">Stock:</label>
+                <select id="stock" name="stock">
+                    {% for stock in market_data.keys() %}
+                    <option value="{{ stock }}">{{ stock }}</option>
+                    {% endfor %}
+                </select>
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" min="1" required>
+                <button type="submit">Submit</button>
+            </form>
+        </section>
+
+        <!-- Trade History Section -->
+        <section>
+            <h2>Trade History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Stock</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trade in trade_history %}
+                    <tr>
+                        <td>{{ trade.action }}</td>
+                        <td>{{ trade.stock }}</td>
+                        <td>{{ trade.quantity }}</td>
+                        <td>${{ "%.2f"|format(trade.price) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>
